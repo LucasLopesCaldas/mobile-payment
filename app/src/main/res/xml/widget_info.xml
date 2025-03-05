@@ -2,9 +2,9 @@
 
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/app_name"
-    android:minWidth="500dp"
-    android:minHeight="102dp"
-    android:resizeMode="horizontal|vertical"
+    android:minWidth="200dp"
+    android:minHeight="100dp"
+    android:resizeMode="vertical"
     android:widgetCategory="home_screen"
-    android:updatePeriodMillis="100"
+    android:updatePeriodMillis="0"
     />

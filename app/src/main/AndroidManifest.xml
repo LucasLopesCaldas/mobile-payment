@@ -10,8 +10,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MobilePayment"
-        tools:targetApi="31">
+        android:theme="@style/Theme.MobilePayment">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,7 +26,7 @@
             android:name="androidx.camera.defaultConfig"
             android:value="androidx.camera.camera2.Camera2Config" />
 
-        <receiver android:name=".WidgetReceiver"
+        <receiver android:name=".WidgetProvider"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

@@ -30,6 +30,7 @@ import com.lupus.mobilepayment.dataStore
 import com.lupus.mobilepayment.getPixAmount
 import com.lupus.mobilepayment.getPixCode
 import com.lupus.mobilepayment.getPixUser
+import com.lupus.mobilepayment.newCrc
 import com.lupus.mobilepayment.savePixCode
 import com.lupus.mobilepayment.ui.components.CurrencyTextField
 import com.lupus.mobilepayment.ui.theme.MobilePaymentTheme
@@ -73,7 +74,7 @@ fun Home() {
             state == "ready" && validCode && pixCode.isNotEmpty() -> {
                 transactionAmount = getPixAmount(pixCode)
                 Column(
-                    Modifier.fillMaxWidth(),
+                    Modifier.fillMaxWidth().padding(top = 86.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     QrCodeView(text = pixCode)

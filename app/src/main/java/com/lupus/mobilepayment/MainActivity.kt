@@ -1,6 +1,10 @@
 package com.lupus.mobilepayment
 
+import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,10 +26,19 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-//        runBlocking {
-//            Widget.updateAll(this@MainActivity)
-//        }
+        val appWidgetManager = AppWidgetManager.getInstance(this)
+        val provider = ComponentName(this, WidgetProvider::class.java)
+        val allWidgetIds =
+            appWidgetManager.getAppWidgetIds(ComponentName(this, WidgetProvider::class.java))
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && allWidgetIds.isEmpty()) {
+            if (appWidgetManager.isRequestPinAppWidgetSupported) {
+                val pinnedWidgetCallback = PendingIntent.getBroadcast(
+                    this, 0, Intent(), PendingIntent.FLAG_IMMUTABLE
+                )
+                appWidgetManager.requestPinAppWidget(provider, null, pinnedWidgetCallback)
+            }
+        }
 
         enableEdgeToEdge()
         setContent {
@@ -39,5 +52,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-

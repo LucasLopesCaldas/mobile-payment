@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -79,13 +80,14 @@ fun QrCodeReader(onQrCodeScanned: (String?) -> Unit) {
             ) == PackageManager.PERMISSION_GRANTED
         )
     }
+    var cameraAvailable by remember { mutableStateOf(false) }
+
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         hasCameraPermission = isGranted
     }
 
-    // File picker launcher
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -100,17 +102,21 @@ fun QrCodeReader(onQrCodeScanned: (String?) -> Unit) {
     LaunchedEffect(key1 = true) {
         if (!hasCameraPermission) {
             permissionLauncher.launch(Manifest.permission.CAMERA)
+        } else {
+            cameraProviderFuture.addListener({
+                val cameraProvider = cameraProviderFuture.get()
+                cameraAvailable = cameraProvider.hasCamera(CameraSelector.DEFAULT_BACK_CAMERA)
+            }, ContextCompat.getMainExecutor(context))
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        if (hasCameraPermission) {
-            // Camera-based QR Code Reader
+        if (hasCameraPermission && cameraAvailable) {
             AndroidView(
                 modifier = Modifier.fillMaxSize(),
                 factory = { ctx ->
-                    val cameraProvider = cameraProviderFuture.get()
                     val previewView = PreviewView(ctx)
+                    val cameraProvider = cameraProviderFuture.get()
 
                     val preview = Preview.Builder().build().apply {
                         surfaceProvider = previewView.surfaceProvider
@@ -135,7 +141,7 @@ fun QrCodeReader(onQrCodeScanned: (String?) -> Unit) {
                             imageAnalyzer
                         )
                     } catch (e: Exception) {
-                        Log.e("QrCodeReader", "Error binding use cases", e)
+                        println("Error binding use cases")
                     }
 
                     previewView
@@ -149,11 +155,14 @@ fun QrCodeReader(onQrCodeScanned: (String?) -> Unit) {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Camera permission required")
+                Text(
+                    text = if (!hasCameraPermission) "Camera permission required"
+                    else "No camera found",
+                    fontSize = 18.sp
+                )
             }
         }
 
-        // Button to pick an image file
         Button(
             onClick = { imagePickerLauncher.launch("image/*") },
             modifier = Modifier
@@ -164,6 +173,7 @@ fun QrCodeReader(onQrCodeScanned: (String?) -> Unit) {
         }
     }
 }
+
 
 private fun decodeBitmapFromUri(context: Context, uri: android.net.Uri): Bitmap? {
     return try {

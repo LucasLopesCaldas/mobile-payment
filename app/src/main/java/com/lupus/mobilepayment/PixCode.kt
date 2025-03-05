@@ -22,6 +22,10 @@ fun changePixAmount(pixCode: String, newAmount: Double): String {
     val countryReg = Regex("58\\d\\d[A-Z]{2}")
     val newSize = newAmountStr.length
 
+    if (newAmount == 0.00) {
+        return newCrc(amountReg.replace(pixCode, ""))
+    }
+
     var id: List<String>? = null
 
     var changedPixCode = amountReg.replace(pixCode) { matchResult ->
